@@ -1,0 +1,40 @@
+package {
+    default_applicable_licenses: ["runtime_floral_lxcfs_license"],
+}
+
+license {
+    name: "runtime_floral_lxcfs_license",
+    visibility: [":__subpackages__"],
+    license_kinds: ["SPDX-license-identifier-Apache-2.0"],
+    license_text: ["LICENSE"],
+}
+
+cc_defaults {
+    name: "floral_lxcfs_bind_defaults",
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+    cpp_std: "c++17",
+}
+
+cc_binary {
+    name: "floral_lxcfs_bind",
+    defaults: ["floral_lxcfs_bind_defaults"],
+    srcs: [
+        "src/floral_lxcfs_bind.cpp",
+        "src/mount_info.cpp",
+    ],
+    shared_libs: ["libbase"],
+    init_rc: ["init/floral-lxcfs.rc"],
+}
+
+cc_test_host {
+    name: "floral_lxcfs_bind_test",
+    defaults: ["floral_lxcfs_bind_defaults"],
+    srcs: [
+        "src/mount_info.cpp",
+        "tests/mount_info_test.cpp",
+    ],
+}

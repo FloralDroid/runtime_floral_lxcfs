@@ -1,0 +1,15 @@
+service floral-lxcfs-bind /system/bin/floral_lxcfs_bind
+    class core
+    user root
+    group root
+    disabled
+    oneshot
+
+# Android mounts its final procfs during early boot. Apply the optional
+# LXCFS views only after that mount is in place.
+on post-fs-data
+    start floral-lxcfs-bind
+
+# Retry once after boot in case a later early-boot action replaced procfs.
+on property:sys.boot_completed=1
+    start floral-lxcfs-bind
