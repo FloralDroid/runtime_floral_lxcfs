@@ -48,6 +48,7 @@ constexpr View kViews[] = {
     {"/run/floral-lxcfs/proc/pressure/memory", "/proc/pressure/memory"},
     {"/run/floral-lxcfs/sys/devices/system/cpu", "/sys/devices/system/cpu"},
     {"/run/floral-lxcfs/sys/devices/system/node", "/sys/devices/system/node"},
+    {"/run/floral-lxcfs/sys/block", "/sys/block"},
 };
 
 bool Exists(const char *path) {
