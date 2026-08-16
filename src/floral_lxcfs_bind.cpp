@@ -36,11 +36,14 @@ constexpr View kViews[] = {
     {"/run/floral-lxcfs/proc/uptime", "/proc/uptime"},
     {"/run/floral-lxcfs/proc/loadavg", "/proc/loadavg"},
     {"/run/floral-lxcfs/proc/slabinfo", "/proc/slabinfo"},
+    {"/run/floral-lxcfs/proc/zoneinfo", "/proc/zoneinfo"},
+    {"/run/floral-lxcfs/proc/vmstat", "/proc/vmstat"},
     {"/run/floral-lxcfs/proc/diskstats", "/proc/diskstats"},
     {"/run/floral-lxcfs/proc/pressure/cpu", "/proc/pressure/cpu"},
     {"/run/floral-lxcfs/proc/pressure/io", "/proc/pressure/io"},
     {"/run/floral-lxcfs/proc/pressure/memory", "/proc/pressure/memory"},
     {"/run/floral-lxcfs/sys/devices/system/cpu", "/sys/devices/system/cpu"},
+    {"/run/floral-lxcfs/sys/devices/system/node", "/sys/devices/system/node"},
 };
 
 bool Exists(const char* path) {
