@@ -8,8 +8,9 @@ source tree.
 The `floral_lxcfs_bind` binary is a short-lived init helper. It does nothing
 when `/run/floral-lxcfs` is absent, and otherwise binds the available CPU,
 memory, proc and sysfs views after Android has mounted its final procfs. This
-includes the cgroup-backed `zoneinfo`, `vmstat`, CPU topology and single-node
-NUMA views exposed by Floral LXCFS.
+includes the cgroup-backed `zoneinfo`, `vmstat`, `buddyinfo`, profile-backed
+kernel identity, CPU topology and single-node NUMA views exposed by Floral
+LXCFS.
 
 The container launcher should expose the host mount with:
 

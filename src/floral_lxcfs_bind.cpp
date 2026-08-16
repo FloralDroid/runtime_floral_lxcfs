@@ -24,8 +24,8 @@ constexpr char kMountInfo[] = "/proc/self/mountinfo";
 constexpr char kFloralFilesystem[] = "fuse.floral-lxcfs";
 
 struct View {
-    const char* source;
-    const char* target;
+  const char *source;
+  const char *target;
 };
 
 constexpr View kViews[] = {
@@ -38,6 +38,10 @@ constexpr View kViews[] = {
     {"/run/floral-lxcfs/proc/slabinfo", "/proc/slabinfo"},
     {"/run/floral-lxcfs/proc/zoneinfo", "/proc/zoneinfo"},
     {"/run/floral-lxcfs/proc/vmstat", "/proc/vmstat"},
+    {"/run/floral-lxcfs/proc/buddyinfo", "/proc/buddyinfo"},
+    {"/run/floral-lxcfs/proc/version", "/proc/version"},
+    {"/run/floral-lxcfs/proc/sys/kernel/osrelease",
+     "/proc/sys/kernel/osrelease"},
     {"/run/floral-lxcfs/proc/diskstats", "/proc/diskstats"},
     {"/run/floral-lxcfs/proc/pressure/cpu", "/proc/pressure/cpu"},
     {"/run/floral-lxcfs/proc/pressure/io", "/proc/pressure/io"},
@@ -46,73 +50,73 @@ constexpr View kViews[] = {
     {"/run/floral-lxcfs/sys/devices/system/node", "/sys/devices/system/node"},
 };
 
-bool Exists(const char* path) {
-    struct stat status = {};
-    return stat(path, &status) == 0;
+bool Exists(const char *path) {
+  struct stat status = {};
+  return stat(path, &status) == 0;
 }
 
-bool IsDirectory(const char* path) {
-    struct stat status = {};
-    return stat(path, &status) == 0 && S_ISDIR(status.st_mode);
+bool IsDirectory(const char *path) {
+  struct stat status = {};
+  return stat(path, &status) == 0 && S_ISDIR(status.st_mode);
 }
 
 std::string ReadMountInfo() {
-    std::ifstream stream(kMountInfo);
-    if (!stream.is_open()) {
-        return {};
-    }
-    return {std::istreambuf_iterator<char>(stream),
-            std::istreambuf_iterator<char>()};
+  std::ifstream stream(kMountInfo);
+  if (!stream.is_open()) {
+    return {};
+  }
+  return {std::istreambuf_iterator<char>(stream),
+          std::istreambuf_iterator<char>()};
 }
 
-bool IsAlreadyMounted(const std::string& mountinfo, const char* target) {
-    return floral::lxcfs::MountInfoHasFilesystem(
-            mountinfo, target, kFloralFilesystem);
+bool IsAlreadyMounted(const std::string &mountinfo, const char *target) {
+  return floral::lxcfs::MountInfoHasFilesystem(mountinfo, target,
+                                               kFloralFilesystem);
 }
 
-bool BindView(const View& view, const std::string& mountinfo) {
-    if (!Exists(view.source) || !Exists(view.target)) {
-        return true;
-    }
+bool BindView(const View &view, const std::string &mountinfo) {
+  if (!Exists(view.source) || !Exists(view.target)) {
+    return true;
+  }
 
-    if (IsAlreadyMounted(mountinfo, view.target)) {
-        LOG(INFO) << "LXCFS view already mounted at " << view.target;
-        return true;
-    }
+  if (IsAlreadyMounted(mountinfo, view.target)) {
+    LOG(INFO) << "LXCFS view already mounted at " << view.target;
+    return true;
+  }
 
-    if (mount(view.source, view.target, nullptr, MS_BIND, nullptr) == 0) {
-        LOG(INFO) << "Mounted LXCFS view " << view.target;
-        return true;
-    }
+  if (mount(view.source, view.target, nullptr, MS_BIND, nullptr) == 0) {
+    LOG(INFO) << "Mounted LXCFS view " << view.target;
+    return true;
+  }
 
-    if (errno == ENOENT || errno == ENOTDIR) {
-        // The optional source or target disappeared during startup.
-        return true;
-    }
-    PLOG(ERROR) << "Unable to bind LXCFS view " << view.source << " to "
-                << view.target;
-    return false;
+  if (errno == ENOENT || errno == ENOTDIR) {
+    // The optional source or target disappeared during startup.
+    return true;
+  }
+  PLOG(ERROR) << "Unable to bind LXCFS view " << view.source << " to "
+              << view.target;
+  return false;
 }
 
-}  // namespace
+} // namespace
 
-int main(int /* argc */, char** argv) {
-    android::base::InitLogging(argv, &android::base::KernelLogger);
+int main(int /* argc */, char **argv) {
+  android::base::InitLogging(argv, &android::base::KernelLogger);
 
-    if (!IsDirectory(kSourceRoot)) {
-        LOG(INFO) << "LXCFS source is not mounted; skipping optional views";
-        return 0;
-    }
+  if (!IsDirectory(kSourceRoot)) {
+    LOG(INFO) << "LXCFS source is not mounted; skipping optional views";
+    return 0;
+  }
 
-    const std::string mountinfo = ReadMountInfo();
-    if (mountinfo.empty()) {
-        LOG(ERROR) << "Unable to read " << kMountInfo;
-        return 1;
-    }
+  const std::string mountinfo = ReadMountInfo();
+  if (mountinfo.empty()) {
+    LOG(ERROR) << "Unable to read " << kMountInfo;
+    return 1;
+  }
 
-    bool success = true;
-    for (const View& view : kViews) {
-        success = BindView(view, mountinfo) && success;
-    }
-    return success ? 0 : 1;
+  bool success = true;
+  for (const View &view : kViews) {
+    success = BindView(view, mountinfo) && success;
+  }
+  return success ? 0 : 1;
 }
