@@ -1,5 +1,7 @@
 # Floral Android LXCFS helper
 
+[简体中文](README.zh-CN.md)
+
 This project contains the Android-side integration for the host
 `floral-lxcfs` FUSE service. It is intentionally separate from the host FUSE
 implementation and is checked out at `system/floral/lxcfs` in the Android
@@ -10,7 +12,9 @@ when `/run/floral-lxcfs` is absent, and otherwise binds the available CPU,
 memory, proc and sysfs views after Android has mounted its final procfs. This
 includes the cgroup-backed `zoneinfo`, `vmstat`, `buddyinfo`, profile-backed
 kernel identity, CPU topology and single-node NUMA views exposed by Floral
-LXCFS.
+LXCFS. When the canonical `/sys/devices/virtual/dmi/id` target exists, the
+helper also masks it with the profile-backed DMI identity view. The usual
+`/sys/class/dmi/id` symlink then resolves to the same mounted directory.
 
 The container launcher should expose the host mount with:
 

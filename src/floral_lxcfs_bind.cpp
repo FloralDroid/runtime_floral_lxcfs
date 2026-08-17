@@ -49,6 +49,8 @@ constexpr View kViews[] = {
     {"/run/floral-lxcfs/sys/devices/system/cpu", "/sys/devices/system/cpu"},
     {"/run/floral-lxcfs/sys/devices/system/node", "/sys/devices/system/node"},
     {"/run/floral-lxcfs/sys/block", "/sys/block"},
+    {"/run/floral-lxcfs/sys/devices/virtual/dmi/id",
+     "/sys/devices/virtual/dmi/id"},
 };
 
 bool Exists(const char *path) {
@@ -76,7 +78,11 @@ bool IsAlreadyMounted(const std::string &mountinfo, const char *target) {
 }
 
 bool BindView(const View &view, const std::string &mountinfo) {
-  if (!Exists(view.source) || !Exists(view.target)) {
+  if (!Exists(view.source)) {
+    return true;
+  }
+  if (!Exists(view.target)) {
+    LOG(WARNING) << "LXCFS target is unavailable; skipping " << view.target;
     return true;
   }
 
