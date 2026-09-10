@@ -15,6 +15,9 @@ kernel identity, CPU topology and single-node NUMA views exposed by Floral
 LXCFS. When the canonical `/sys/devices/virtual/dmi/id` target exists, the
 helper also masks it with the profile-backed DMI identity view. The usual
 `/sys/class/dmi/id` symlink then resolves to the same mounted directory.
+The helper also binds the profile-backed battery thermal zone at
+`/sys/devices/virtual/thermal` and `/sys/class/thermal`, and masks
+`/sys/class/hwmon` with an empty view.
 
 The container launcher should expose the host mount with:
 
