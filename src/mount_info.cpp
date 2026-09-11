@@ -61,9 +61,9 @@ std::string UnescapeMountInfoPath(std::string_view value) {
     return UnescapeField(value);
 }
 
-bool MountInfoHasFilesystem(std::string_view mountinfo,
-                            std::string_view mountpoint,
-                            std::string_view filesystem) {
+static bool MountInfoMatches(std::string_view mountinfo,
+                             std::string_view mountpoint,
+                             std::string_view filesystem) {
     size_t line_start = 0;
     while (line_start < mountinfo.size()) {
         const size_t line_end = mountinfo.find('\n', line_start);
@@ -82,7 +82,7 @@ bool MountInfoHasFilesystem(std::string_view mountinfo,
             // The post-separator first field is the filesystem type.
             if (left.size() >= 5 && !right.empty() &&
                 UnescapeField(left[4]) == mountpoint &&
-                right[0] == filesystem) {
+                (filesystem.empty() || right[0] == filesystem)) {
                 return true;
             }
         }
@@ -92,6 +92,17 @@ bool MountInfoHasFilesystem(std::string_view mountinfo,
         line_start = line_end + 1;
     }
     return false;
+}
+
+bool MountInfoHasFilesystem(std::string_view mountinfo,
+                            std::string_view mountpoint,
+                            std::string_view filesystem) {
+    return MountInfoMatches(mountinfo, mountpoint, filesystem);
+}
+
+bool MountInfoHasMountpoint(std::string_view mountinfo,
+                            std::string_view mountpoint) {
+    return MountInfoMatches(mountinfo, mountpoint, {});
 }
 
 }  // namespace floral::lxcfs

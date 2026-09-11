@@ -25,7 +25,9 @@ int main() {
     const std::string mountinfo =
             "41 31 0:42 / /proc/cpuinfo rw - fuse.floral-lxcfs "
             "/run/floral-lxcfs/proc/cpuinfo rw\n"
-            "42 31 0:43 / /proc/meminfo rw - proc proc rw\n";
+            "42 31 0:43 / /proc/meminfo rw - proc proc rw\n"
+            "43 31 0:44 /memfd:floral /sys/class/graphics/fb0/virtual_size ro - "
+            "tmpfs memfd:floral rw\n";
 
     const bool ok =
             Check(floral::lxcfs::UnescapeMountInfoPath("/run/a\\040b") ==
@@ -39,6 +41,11 @@ int main() {
                   "reject unrelated filesystem") &&
             Check(!floral::lxcfs::MountInfoHasFilesystem(
                           mountinfo, "/proc/stat", "fuse.floral-lxcfs"),
-                  "reject unrelated mountpoint");
+                  "reject unrelated mountpoint") &&
+            Check(floral::lxcfs::MountInfoHasMountpoint(
+                          mountinfo, "/sys/class/graphics/fb0/virtual_size"),
+                  "find generated file bind mount") &&
+            Check(!floral::lxcfs::MountInfoHasMountpoint(mountinfo, "/proc/stat"),
+                  "reject absent mountpoint");
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }

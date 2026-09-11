@@ -21,6 +21,9 @@ The helper also binds the profile-backed battery thermal zone at
 `hwmon` directories below `/sys/devices` that contain `tempN_input` files and
 masks only those directories. This prevents direct platform or PCI hwmon paths
 from exposing host temperatures without hiding the rest of the device tree.
+The helper also generates framebuffer `virtual_size` and `modes` views from
+`ro.boot.floral_width`, `ro.boot.floral_height`, and `ro.boot.floral_fps`, so
+those nodes report the effective container display rather than the host mode.
 
 The container launcher should expose the host mount with:
 

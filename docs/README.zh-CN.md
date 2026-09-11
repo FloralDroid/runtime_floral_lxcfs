@@ -14,6 +14,9 @@
 `/sys/devices` 下查找包含 `tempN_input` 文件的真实、非软链接 `hwmon` 目录，
 并只屏蔽这些目录。这样既能阻止应用通过 platform 或 PCI 路径直接读取宿主
 温度，也不会隐藏设备树的其他部分。
+辅助进程还会根据 `ro.boot.floral_width`、`ro.boot.floral_height` 和
+`ro.boot.floral_fps` 生成 framebuffer 的 `virtual_size` 与 `modes` 视图，
+使这两个节点呈现容器实际显示配置，而不是宿主显示模式。
 
 容器启动器应通过以下挂载选项暴露主机挂载点：
 

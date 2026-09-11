@@ -18,4 +18,7 @@ bool MountInfoHasFilesystem(std::string_view mountinfo,
                             std::string_view mountpoint,
                             std::string_view filesystem);
 
+bool MountInfoHasMountpoint(std::string_view mountinfo,
+                            std::string_view mountpoint);
+
 }  // namespace floral::lxcfs
