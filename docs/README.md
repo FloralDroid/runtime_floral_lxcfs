@@ -17,7 +17,10 @@ helper also masks it with the profile-backed DMI identity view. The usual
 `/sys/class/dmi/id` symlink then resolves to the same mounted directory.
 The helper also binds the profile-backed battery thermal zone at
 `/sys/devices/virtual/thermal` and `/sys/class/thermal`, and masks
-`/sys/class/hwmon` with an empty view.
+`/sys/class/hwmon` with an empty view. It also discovers real, non-symlinked
+`hwmon` directories below `/sys/devices` that contain `tempN_input` files and
+masks only those directories. This prevents direct platform or PCI hwmon paths
+from exposing host temperatures without hiding the rest of the device tree.
 
 The container launcher should expose the host mount with:
 

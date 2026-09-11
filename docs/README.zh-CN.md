@@ -10,7 +10,10 @@
 这些视图包括由 Floral LXCFS 提供的、基于 cgroup 的 `zoneinfo`、`vmstat`、`buddyinfo`，基于配置文件的核标识、CPU 拓扑以及单节点 NUMA 视图。
 当规范的 `/sys/devices/virtual/dmi/id` 目标存在时，该辅助进程还会用配置文件提供的 DMI 标识视图将其屏蔽（mask），通常的 `/sys/class/dmi/id` 软链接会解析到同一个挂载目录。
 辅助进程还会将配置文件提供的电池热区绑定到 `/sys/devices/virtual/thermal` 和
-`/sys/class/thermal`，并用空视图屏蔽 `/sys/class/hwmon`。
+`/sys/class/thermal`，并用空视图屏蔽 `/sys/class/hwmon`。它还会在
+`/sys/devices` 下查找包含 `tempN_input` 文件的真实、非软链接 `hwmon` 目录，
+并只屏蔽这些目录。这样既能阻止应用通过 platform 或 PCI 路径直接读取宿主
+温度，也不会隐藏设备树的其他部分。
 
 容器启动器应通过以下挂载选项暴露主机挂载点：
 

@@ -17,6 +17,7 @@ cc_defaults {
         "-Wextra",
     ],
     cpp_std: "c++17",
+    static_libs: ["libc++fs"],
 }
 
 cc_binary {
@@ -25,9 +26,20 @@ cc_binary {
     srcs: [
         "src/floral_lxcfs_bind.cpp",
         "src/mount_info.cpp",
+        "src/sysfs_mask.cpp",
     ],
     shared_libs: ["libbase"],
     init_rc: ["init/floral-lxcfs.rc"],
+}
+
+cc_test_host {
+    name: "floral_lxcfs_sysfs_mask_test",
+    defaults: ["floral_lxcfs_bind_defaults"],
+    local_include_dirs: ["src"],
+    srcs: [
+        "src/sysfs_mask.cpp",
+        "tests/sysfs_mask_test.cpp",
+    ],
 }
 
 cc_test_host {

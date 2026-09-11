@@ -6,6 +6,7 @@
  */
 
 #include "mount_info.h"
+#include "sysfs_mask.h"
 
 #include <android-base/logging.h>
 
@@ -16,12 +17,16 @@
 #include <fstream>
 #include <iterator>
 #include <string>
+#include <vector>
 
 namespace {
 
 constexpr char kSourceRoot[] = "/run/floral-lxcfs";
 constexpr char kMountInfo[] = "/proc/self/mountinfo";
 constexpr char kFloralFilesystem[] = "fuse.floral-lxcfs";
+constexpr char kSysDevices[] = "/sys/devices";
+constexpr char kSysClassHwmon[] = "/sys/class/hwmon";
+constexpr char kEmptyHwmonSource[] = "/run/floral-lxcfs/sys/class/hwmon";
 
 struct View {
   const char *source;
@@ -126,7 +131,20 @@ int main(int /* argc */, char **argv) {
   }
 
   bool success = true;
+  std::vector<std::string> temperature_hwmon_directories;
+  if (IsDirectory(kSysClassHwmon) &&
+      !floral::lxcfs::FindTemperatureHwmonDirectories(
+          kSysClassHwmon, kSysDevices, &temperature_hwmon_directories)) {
+    LOG(ERROR) << "Unable to inspect " << kSysClassHwmon
+               << " for temperature providers";
+    success = false;
+  }
+
   for (const View &view : kViews) {
+    success = BindView(view, mountinfo) && success;
+  }
+  for (const std::string &target : temperature_hwmon_directories) {
+    const View view = {kEmptyHwmonSource, target.c_str()};
     success = BindView(view, mountinfo) && success;
   }
   return success ? 0 : 1;
